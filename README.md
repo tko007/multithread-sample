@@ -1,5 +1,4 @@
 # Multithread-sample 
-### Configure and using java8 common thread pool for executing sample jobs.
 
 A set of predefined IJob interface tasks will be executed parallel.
 ---
