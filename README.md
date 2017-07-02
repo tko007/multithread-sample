@@ -1,20 +1,32 @@
 # Multithread-sample 
-## Configure and using java8 common thread pool for executing sample jobs.
+### Configure and using java8 common thread pool for executing sample jobs.
 
-It is able to specify for the common thread pool, how many threads are maximum avaible. #
-By default it is set to number of the cpu avaible threads. In this pool will be executed 
-every jobs, implementing an IJob interface. It could happen, that a job throws an exception 
-during its execution, then the whole pool will be shutting down immediately, 
-so no more jobs will be executed. 
+JobA implementation class let define a set of IJob tasks for execution.
+Those tasks have to be independent from each other. In case of a long running
+task a predefined timeout is set to prevent the system. Due to the timeout is
+configurable, longer tasks could be also executed as well. For the most throughput
+the parallel running thread number is configurable, but there is no guarantee to
+get it, it depends on the tasks (blocking, non-blocking) and the available processor
+cores as well.
 
+Internally the ForkJoinPool framework is used, which is part of the java standard, no
+other dependency needed. The given tasks will be submitted to the pool, which has
+the predefined amount of workers, using parallel stream. In case of any exception
+the pool is immediately shouted down, to prevent other threads from further execution.
+If more threads throw exception in a parallel execution, always the first one will be
+returned to the caller, others are ignored. In every execution (calling execute)
+a new thread pool is created.
 ---
 
 The cool thing about my solution is, it uses a java8 common thread pool, which used by streams as well. 
 So it lets you enable to use the java8 parallstream feature.
 
 ```java
-   ForkJoinTask<?> actualTask =
-      pool.submit(()-> listExecute
-         .parallelStream()
-         .forEach(this::executeJobs));
+ForkJoinTask<?> actualTask =
+  pool.submit(()-> listExecute
+      .parallelStream()
+      .forEach(this::executeJobs));
 ```
+
+---
+Testcases provided for covering all scenarios.
